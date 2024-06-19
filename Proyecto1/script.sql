@@ -140,11 +140,62 @@ GO
 
 
 
+-- Crear la función dbo.F4
+CREATE FUNCTION dbo.F4()
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT *
+    FROM proyecto1.HistoryLog
+);
+GO
+
+-- Ejecutar la función dbo.F4
+SELECT * FROM dbo.F4();
+
+CREATE FUNCTION dbo.Func_tutor_course(@TutorId UNIQUEIDENTIFIER)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT c.CodCourse, c.Name
+    FROM proyecto1.Course c
+    JOIN proyecto1.CourseTutor ct ON c.CodCourse = ct.CourseCodCourse
+    WHERE ct.TutorId = @TutorId
+);
 
 
 
+-- Crear la función dbo.F2
+CREATE FUNCTION dbo.F2(@Id INT)
+RETURNS TABLE
+AS
+RETURN	
+(
+    SELECT c.CodCourse, c.Name
+    FROM proyecto1.Course c
+    JOIN proyecto1.CourseTutor ct ON c.CodCourse = ct.CourseCodCourse
+    JOIN proyecto1.TutorProfile tp ON ct.TutorId = tp.UserId
+    WHERE tp.Id = @Id
+);
+
+
+
+
+
+
+
+-- Ejecutar la función dbo.F2
+SELECT * FROM dbo.F2(1);
+
+-- Ejecutar la función dbo.Func_tutor_course
+SELECT * FROM dbo.Func_tutor_course('D2459BF7-78D7-4B64-B2AB-CD98382F8FE4');
+
+-- Ejecutar el procedimiento almacenado PR3
 EXEC PR3 @Email = 'juan.perez@example.com', @CodCourse = 772;
 
+-- Ejecutar el procedimiento almacenado PR2
 EXEC PR2 @Email = 'maria.gonzalez@example.com', @CodCourse = 970;
 
 
