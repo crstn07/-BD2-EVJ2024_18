@@ -1,9 +1,7 @@
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'PR3')
-BEGIN
-    DROP PROCEDURE PR3;
-END;
-GO
 
+
+
+-- crear el procedimiento PR3
 CREATE PROCEDURE PR3 
     @Email NVARCHAR(256), 
     @CodCourse INT
@@ -71,13 +69,7 @@ END;
 GO
 
 
-
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'PR2')
-BEGIN
-    DROP PROCEDURE PR2;
-END;
-GO
-
+-- crear el procedimiento PR2
 CREATE PROCEDURE PR2 
     @Email NVARCHAR(256), 
     @CodCourse INT
@@ -138,8 +130,6 @@ BEGIN
 END;
 GO
 
-
-
 -- Crear la función dbo.F4
 CREATE FUNCTION dbo.F4()
 RETURNS TABLE
@@ -150,22 +140,6 @@ RETURN
     FROM proyecto1.HistoryLog
 );
 GO
-
--- Ejecutar la función dbo.F4
-SELECT * FROM dbo.F4();
-
-CREATE FUNCTION dbo.Func_tutor_course(@TutorId UNIQUEIDENTIFIER)
-RETURNS TABLE
-AS
-RETURN
-(
-    SELECT c.CodCourse, c.Name
-    FROM proyecto1.Course c
-    JOIN proyecto1.CourseTutor ct ON c.CodCourse = ct.CourseCodCourse
-    WHERE ct.TutorId = @TutorId
-);
-
-
 
 -- Crear la función dbo.F2
 CREATE FUNCTION dbo.F2(@Id INT)
@@ -180,40 +154,3 @@ RETURN
     WHERE tp.Id = @Id
 );
 
-
-
-
-
-
-
--- Ejecutar la función dbo.F2
-SELECT * FROM dbo.F2(1);
-
--- Ejecutar la función dbo.Func_tutor_course
-SELECT * FROM dbo.Func_tutor_course('D2459BF7-78D7-4B64-B2AB-CD98382F8FE4');
-
--- Ejecutar el procedimiento almacenado PR3
-EXEC PR3 @Email = 'juan.perez@example.com', @CodCourse = 772;
-
--- Ejecutar el procedimiento almacenado PR2
-EXEC PR2 @Email = 'maria.gonzalez@example.com', @CodCourse = 970;
-
-
-INSERT INTO [BD2].[proyecto1].[Usuarios] 
-  ([Id], [Firstname], [Lastname], [Email], [DateOfBirth], [Password], [LastChanges], [EmailConfirmed])
-VALUES 
-  (NEWID(), 'Juan', 'Pérez', 'juan.perez@example.com', '1990-01-15', 'password123', GETDATE(), 1),
-  (NEWID(), 'María', 'González', 'maria.gonzalez@example.com', '1992-05-21', 'password123', GETDATE(), 1),
-  (NEWID(), 'Carlos', 'Rodríguez', 'carlos.rodriguez@example.com', '1988-11-30', 'password123', GETDATE(), 1),
-  (NEWID(), 'Ana', 'Martínez', 'ana.martinez@example.com', '1995-07-14', 'password123', GETDATE(), 1),
-  (NEWID(), 'Luis', 'Fernández', 'luis.fernandez@example.com', '1993-03-05', 'password123', GETDATE(), 1);
-
-
-INSERT INTO BD2.proyecto1.TutorProfile (UserId, TutorCode)
-VALUES 
-  ('D2459BF7-78D7-4B64-B2AB-CD98382F8FE4', '100');
-
-
-INSERT INTO BD2.proyecto1.CourseTutor (TutorId, CourseCodCourse)
-VALUES 
-  ('D2459BF7-78D7-4B64-B2AB-CD98382F8FE4', 772);
