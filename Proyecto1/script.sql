@@ -154,3 +154,187 @@ RETURN
     WHERE tp.Id = @Id
 );
 
+-- >>>>>>>>>>>>>>>>TRIGGER PARA HISTORYLOG<<<<<<<<<<<<<<<<
+
+-- TRIGGER COURSE
+CREATE TRIGGER proyecto1.TriggerCourse
+ON proyecto1.Course
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla Course';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+-- TRIGGER COURSEASSIGNMENT
+CREATE TRIGGER proyecto1.TriggerCourseAssignment
+ON proyecto1.CourseAssignment
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla CourseAssigment';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+
+-- TRIGGER Course Tutor
+CREATE TRIGGER proyecto1.TriggerCourseTutor
+ON proyecto1.CourseTutor
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla CourseTutor';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+-- No HistoryLog
+-- No Notification
+
+-- TRIGGER Profile Student
+CREATE TRIGGER proyecto1.TriggerProfileStudent
+ON proyecto1.ProfileStudent
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla ProfileStudent';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+-- No roles
+
+-- TRIGGER TFA
+CREATE TRIGGER proyecto1.TriggerTFA
+ON proyecto1.TFA
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla TFA';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+-- TRIGGER TutorProfile
+CREATE TRIGGER proyecto1.TriggerTutorProfile
+ON proyecto1.TutorProfile
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla TutorProfile';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+
+-- TRIGGER UsuarioRole
+CREATE TRIGGER proyecto1.TriggerUsuarioRole
+ON proyecto1.UsuarioRole
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla UsuarioRole';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
+
+-- TRIGGER USUARIOS
+CREATE TRIGGER proyecto1.TriggerUsuarios
+ON proyecto1.Usuarios
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    DECLARE @Operacion VARCHAR(20);
+    DECLARE @Descripcion VARCHAR(100);
+
+   IF EXISTS (SELECT * FROM inserted)
+        SET @Operacion = 'INSERT';
+    ELSE IF EXISTS (SELECT * FROM deleted)
+        SET @Operacion = 'DELETE';
+    ELSE
+        SET @Operacion = 'UPDATE';
+
+    SET @Descripcion = 'Operacion ' + @Operacion + ' Exitosa - Tabla Usuarios';
+
+    INSERT INTO proyecto1.HistoryLog ([Date], Description)
+    VALUES (GETDATE(), @Descripcion);
+END;
