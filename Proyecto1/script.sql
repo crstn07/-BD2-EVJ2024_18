@@ -223,8 +223,8 @@ BEGIN
     VALUES (GETDATE(), @Descripcion);
 END;
 
--- No HistoryLog
--- No Notification
+-- No trigger para tabla HistoryLog
+-- No trigger para tabla Notification
 
 -- TRIGGER Profile Student
 CREATE TRIGGER proyecto1.TriggerProfileStudent
@@ -248,7 +248,7 @@ BEGIN
     VALUES (GETDATE(), @Descripcion);
 END;
 
--- No roles
+-- No trigger para tabla roles
 
 -- TRIGGER TFA
 CREATE TRIGGER proyecto1.TriggerTFA
