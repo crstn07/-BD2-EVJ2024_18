@@ -11,6 +11,148 @@
 -- DROP FUNCTION IF EXISTS proyecto1.F5;
 
 -- >>>>>>>>>>>>>>>> PROCEDIMIENTOS <<<<<<<<<<<<<<<<
+-- PROCEDIMIENTO PR1 (Registro de Usuarios)
+create procedure proyecto1.PR1
+    @Firstname nvarchar(max),
+    @Lastname nvarchar(max),
+    @Email nvarchar(max),
+    @DateOfBirth datetime2 (7),
+    @Password nvarchar(max),
+    @Credits int
+as
+begin
+    set nocount on;
+    DECLARE @UserId uniqueidentifier;
+    DECLARE @RolId uniqueidentifier;
+    DECLARE @ErrorMessage NVARCHAR(250);
+    DECLARE @ErrorSeverity INT;
+
+    -- Validaciones de cada campo
+    -- Firtsname Vacio
+    IF (@Firstname IS NULL OR @Firstname = '')
+    BEGIN
+        SET @ErrorMessage = 'Error, El nombre no puede ir vacio';
+        SET @ErrorSeverity = 16;
+        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        RETURN;
+    END
+
+    -- Apellido Vacio
+    IF (@Lastname IS NULL OR @Lastname = '')
+    BEGIN
+        SET @ErrorMessage = 'Error, El apellido no puede ir vacio';
+        SET @ErrorSeverity = 16;
+        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        RETURN;
+    END
+
+    -- Email Vacio
+    IF (@Email IS NULL OR @Email = '')
+    BEGIN
+        SET @ErrorMessage = 'Error, El campo correo no puede ir vacio';
+        SET @ErrorSeverity = 16;
+        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        RETURN;
+    END
+
+    -- Fecha de Nacimiento Vacio
+    IF (@DateOfBirth IS NULL)
+    BEGIN
+        SET @ErrorMessage = 'Error, La fecha de nacimiento no puede ir vacia';
+        SET @ErrorSeverity = 16;
+        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        RETURN;
+    END
+
+    -- Contraseña Vacía
+    IF (@Password IS NULL OR @Password = '')
+    BEGIN
+        SET @ErrorMessage = 'Error, El password no puede estar vacía';
+        SET @ErrorSeverity = 16;
+        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        RETURN;
+    END
+
+    -- Creditos negativos
+    IF (@Credits < 0)
+    BEGIN
+        SET @ErrorMessage = 'Error, No puede ingresar una cantidad de creditos negativa';
+        SET @ErrorSeverity = 16;
+        RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+        RETURN;
+    END
+
+    -- Validación de datos
+     BEGIN TRY
+    	
+        BEGIN TRANSACTION;
+
+    	-- Validar datos con el PR6
+        DECLARE @IsValid BIT;
+        EXEC proyecto1.PR6 'Usuarios', @Firstname, @Lastname, NULL, NULL, @IsValid OUTPUT;
+        IF(@IsValid = 0)
+        BEGIN
+            SET @ErrorMessage = 'Los campos son incorrectos, tienen caracteres invalidos';
+            SET @ErrorSeverity = 16;
+            RAISERROR(@ErrorMessage,@ErrorSeverity,1);
+            RETURN;
+        END
+
+        -- Validar email
+        IF EXISTS (SELECT * FROM proyecto1.Usuarios WHERE Email = @Email)
+        BEGIN
+            SET @ErrorMessage = 'Este email ya se encuentra registrado en otra cuenta';
+            SET @ErrorSeverity = 16;
+            RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+            RETURN;
+        END
+
+        -- Asignacion rol de estudiante
+        SET @RolId = (SELECT Id FROM proyecto1.Roles WHERE RoleName = 'Student');
+        IF @RolId IS NULL
+        BEGIN
+            SET @ErrorMessage = 'El rol Student no existe';
+            SET @ErrorSeverity = 16;
+            RAISERROR(@ErrorMessage, @ErrorSeverity, 1);
+            RETURN;
+        END
+
+        -- Insert tabla Usuarios
+        SET @UserId = NEWID();
+        INSERT INTO proyecto1.Usuarios(Id, Firstname, Lastname, Email, DateOfBirth, Password, LastChanges, EmailConfirmed)
+        VALUES (@UserId, @Firstname, @Lastname, @Email, @DateOfBirth, @Password, GETDATE(), 1);
+
+        -- Insert tabla UsuarioRole
+        INSERT INTO proyecto1.UsuarioRole (RoleId, UserId, IsLatestVersion)
+        VALUES (@RolId, @UserId, 1);
+
+        -- Insert tabla ProfileStudent
+        INSERT INTO proyecto1.ProfileStudent (UserId, Credits)
+        VALUES (@UserId, @Credits);
+
+        -- Insert tabla TFA
+        INSERT INTO proyecto1.TFA (UserId, Status, LastUpdate)
+        VALUES (@UserId, 1, GETDATE());
+
+        -- Insert tabla Notification
+        INSERT INTO proyecto1.Notification (UserId, Message, Date)
+        VALUES (@UserId, 'Se ha registrado correctamente', GETDATE());
+		PRINT 'El estudiante se ha registrado correctamente';
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+          -- Error - transacción cancelada
+        ROLLBACK;
+        SELECT @ErrorMessage = ERROR_MESSAGE();
+		-- Registro del error en la tabla HistoryLog
+        INSERT INTO proyecto1.HistoryLog (Date, Description)
+        VALUES (GETDATE(), 'Error Registro Usuario - ' + @ErrorMessage);
+       	PRINT 'Registro no pudo realizarse'
+        RAISERROR (@ErrorMessage, 16, 1);
+    END CATCH;
+END;
+GO
 
 -- PROCEDIMIENTO PR2 (Cambio de Roles)
 CREATE PROCEDURE proyecto1.PR2 
@@ -201,6 +343,63 @@ BEGIN
 END
 GO
 
+-- PROCEDIMIENTO PR5 (Validacion de Datos)
+
+CREATE PROCEDURE proyecto1.PR5(@CodCourse int, @Name nvarchar(max), @CreditsRequired int)
+AS BEGIN
+    DECLARE @Description nvarchar(max);
+    Declare @IsValid BIT;
+    -- Validación de datos con el PR6
+    EXEC proyecto1.PR6 'Course',NULL,NULL, @Name, @CreditsRequired, @IsValid OUTPUT ;
+    IF @IsValid = 0
+        BEGIN
+            -- Sí los datos son incorrectos
+            SET @Description = 'No se pudo crear el curso correctamente';
+            INSERT INTO proyecto1.HistoryLog ([Date], Description)
+            VALUES (GETDATE(), @Description);
+            SELECT @Description AS 'Error';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+    -- Error si los creditos nos son corrrectos
+    IF @CreditsRequired < 0
+        BEGIN
+            SET @Description = 'Creación de Curso Erronea Creditos con valor menos a 0';
+            INSERT INTO proyecto1.HistoryLog ([Date], Description)
+            VALUES (GETDATE(), @Description);
+            SELECT @Description AS 'Error';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+    -- Error si el código de curso no es corrrecto
+    IF @CodCourse < 0
+        BEGIN
+            SET @Description = 'Creación de Curso Erronea Código de Curso invalido';
+            INSERT INTO proyecto1.HistoryLog ([Date], Description)
+            VALUES (GETDATE(), @Description);
+            SELECT @Description AS 'Error';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        -- Creación del curso
+        INSERT INTO proyecto1.Course(CodCourse, Name, CreditsRequired) VALUES
+        (@CodCourse, @Name, @CreditsRequired);
+        SELECT 'Creacion de Curso Correcta' AS Mensaje;
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        -- Sí hay error en la inserción
+        SET @Description = 'Creacion de Curso Incorrecta'+ ERROR_MESSAGE();
+        SELECT @Description AS 'Error';
+        ROLLBACK TRANSACTION;
+    END CATCH;
+END;
+GO
+
 -- PROCEDIMIENTO PR6 (Validacion de Datos)
 CREATE PROCEDURE proyecto1.PR6
     @EntityName NVARCHAR(50),
@@ -254,7 +453,7 @@ RETURN
 GO
 
 -- FUNCION 2:  Func_tutor_course
-CREATE FUNCTION proyecto1.F2(@Id INT)
+CREATE FUNCTION proyecto1.F2(@Id UNIQUEIDENTIFIER)
 RETURNS TABLE
 AS
 RETURN	
@@ -289,8 +488,25 @@ RETURN
 GO
 
 -- FUNCION 5: Func_usuarios
-
-
+CREATE FUNCTION proyecto1.F5 (@Id uniqueidentifier)
+RETURNS TABLE
+    AS
+    RETURN
+(
+    select
+        US.Firstname,
+        US.Lastname,
+        US.Email,
+        US.DateOfBirth,
+        PROF.Credits,
+        ROL.RoleName
+    from Usuarios US
+    inner join UsuarioRole UROL on US.Id = UROL.UserId
+    inner join Roles ROL on UROL.RoleId = ROL.Id
+    left join ProfileStudent PROF on US.Id = PROF.UserId
+    where US.Id = @Id
+);
+GO
 
 
 -- >>>>>>>>>>>>>>>>TRIGGER PARA HISTORYLOG<<<<<<<<<<<<<<<<
