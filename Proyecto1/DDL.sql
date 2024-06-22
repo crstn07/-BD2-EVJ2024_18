@@ -343,7 +343,7 @@ BEGIN
 END
 GO
 
--- PROCEDIMIENTO PR5 (Validacion de Datos)
+-- PROCEDIMIENTO PR5 (Creacion de Cursos)
 
 CREATE PROCEDURE proyecto1.PR5(@CodCourse int, @Name nvarchar(max), @CreditsRequired int)
 AS BEGIN
@@ -622,7 +622,6 @@ BEGIN
 END;
 
 -- No trigger para tabla HistoryLog
--- No trigger para tabla Notification
 
 -- TRIGGER Profile Student
 CREATE TRIGGER proyecto1.TriggerProfileStudent
@@ -645,8 +644,6 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
--- No trigger para tabla roles
 
 -- TRIGGER TFA
 CREATE TRIGGER proyecto1.TriggerTFA
