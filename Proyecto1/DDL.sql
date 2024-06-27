@@ -1,15 +1,24 @@
--- DROP PROCEDURE IF EXISTS proyecto1.PR1;
--- DROP PROCEDURE IF EXISTS proyecto1.PR2;
--- DROP PROCEDURE IF EXISTS proyecto1.PR3;
--- DROP PROCEDURE IF EXISTS proyecto1.PR4;
--- DROP PROCEDURE IF EXISTS proyecto1.PR5;
--- DROP PROCEDURE IF EXISTS proyecto1.PR6;
--- DROP FUNCTION IF EXISTS proyecto1.F1;
--- DROP FUNCTION IF EXISTS proyecto1.F2;
--- DROP FUNCTION IF EXISTS proyecto1.F3;
--- DROP FUNCTION IF EXISTS proyecto1.F4;
--- DROP FUNCTION IF EXISTS proyecto1.F5;
-
+DROP PROCEDURE IF EXISTS proyecto1.PR1;
+DROP PROCEDURE IF EXISTS proyecto1.PR2;
+ DROP PROCEDURE IF EXISTS proyecto1.PR3;
+ DROP PROCEDURE IF EXISTS proyecto1.PR4;
+DROP PROCEDURE IF EXISTS proyecto1.PR5;
+DROP PROCEDURE IF EXISTS proyecto1.PR6;
+ DROP FUNCTION IF EXISTS proyecto1.F1;
+ DROP FUNCTION IF EXISTS proyecto1.F2;
+ DROP FUNCTION IF EXISTS proyecto1.F3;
+ DROP FUNCTION IF EXISTS proyecto1.F4;
+DROP FUNCTION IF EXISTS proyecto1.F5;
+DROP TRIGGER IF EXISTS proyecto1.TriggerUsuarios;
+DROP TRIGGER IF EXISTS proyecto1.TriggerUsuarioRole;
+DROP TRIGGER IF EXISTS proyecto1.TriggerTutorProfile;
+DROP TRIGGER IF EXISTS proyecto1.TriggerTFA;
+DROP TRIGGER IF EXISTS proyecto1.TriggerProfileStudent;
+DROP TRIGGER IF EXISTS proyecto1.TriggerCourseTutor;
+DROP TRIGGER IF EXISTS proyecto1.TriggerCourseAssignment;
+DROP TRIGGER IF EXISTS proyecto1.TriggerCourse;
+DROP TRIGGER IF EXISTS proyecto1.TriggerRol ;
+DROP TRIGGER IF EXISTS proyecto1.TriggerNotification;
 -- >>>>>>>>>>>>>>>> PROCEDIMIENTOS <<<<<<<<<<<<<<<<
 -- PROCEDIMIENTO PR1 (Registro de Usuarios)
 create procedure proyecto1.PR1
@@ -436,7 +445,7 @@ BEGIN
         SET @IsValid = 0;
     END;
 END;
-
+GO
 -- >>>>>>>>>>>>>>>> FUNCIONES <<<<<<<<<<<<<<<<
 
 -- FUNCION 1:  Func_course_usuarios
@@ -511,7 +520,7 @@ GO
 
 -- >>>>>>>>>>>>>>>>TRIGGER PARA HISTORYLOG<<<<<<<<<<<<<<<<
 -- TRIGGER NOTIFICACION
-CREATE TRIGGER proyecto1.Notification
+CREATE TRIGGER proyecto1.TriggerNotification
 ON proyecto1.Roles
 AFTER INSERT, UPDATE, DELETE
 AS
@@ -531,6 +540,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
+GO
 
 -- TRIGGER ROL
 CREATE TRIGGER proyecto1.TriggerRol
@@ -553,7 +563,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 -- TRIGGER COURSE
 CREATE TRIGGER proyecto1.TriggerCourse
 ON proyecto1.Course
@@ -575,7 +585,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 -- TRIGGER COURSEASSIGNMENT
 CREATE TRIGGER proyecto1.TriggerCourseAssignment
 ON proyecto1.CourseAssignment
@@ -598,7 +608,7 @@ BEGIN
     VALUES (GETDATE(), @Descripcion);
 END;
 
-
+GO
 -- TRIGGER Course Tutor
 CREATE TRIGGER proyecto1.TriggerCourseTutor
 ON proyecto1.CourseTutor
@@ -620,7 +630,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 -- No trigger para tabla HistoryLog
 
 -- TRIGGER Profile Student
@@ -644,7 +654,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 -- TRIGGER TFA
 CREATE TRIGGER proyecto1.TriggerTFA
 ON proyecto1.TFA
@@ -666,7 +676,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 -- TRIGGER TutorProfile
 CREATE TRIGGER proyecto1.TriggerTutorProfile
 ON proyecto1.TutorProfile
@@ -688,7 +698,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 
 -- TRIGGER UsuarioRole
 CREATE TRIGGER proyecto1.TriggerUsuarioRole
@@ -711,7 +721,7 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
-
+GO
 -- TRIGGER USUARIOS
 CREATE TRIGGER proyecto1.TriggerUsuarios
 ON proyecto1.Usuarios
@@ -733,3 +743,4 @@ BEGIN
     INSERT INTO proyecto1.HistoryLog ([Date], Description)
     VALUES (GETDATE(), @Descripcion);
 END;
+GO
